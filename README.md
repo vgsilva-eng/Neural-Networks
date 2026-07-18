@@ -1,7 +1,7 @@
 # Neural-Networks
 ### AAI-511 · Composer Identification via Deep Learning · University of San Diego
 
-Predict the composer of a classical music piece using LSTM and CNN models trained on MIDI feature representations (Bach, Beethoven, Chopin, Mozart, Schubert).
+Predict the composer of a classical music piece using LSTM and CNN models trained on MIDI feature representations (Bach, Beethoven, Chopin, Mozart).
 
 ---
 
@@ -66,6 +66,20 @@ Dense(n_composers, activation='softmax')
 | **5. CNN Model (TensorFlow / PyTorch)** | Model definition, training with EarlyStopping, accuracy/loss curves |
 | **6. Evaluation & Comparison** | Classification reports, confusion matrices, LSTM vs CNN summary table, hyperparameter analysis |
 | **7. Conclusion & Future Work** | Key findings, limitations, future directions |
+
+---
+
+## Dataset
+
+| Composer | Train | Dev | Test | Total |
+|---|---|---|---|---|
+| Bach | 42 | 4 | 4 | 50 |
+| Beethoven | 42 | 4 | 4 | 50 |
+| Chopin | 41 | 4 | 4 | 49 |
+| Mozart | 41 | 4 | 4 | 49 |
+| **Total** | **166** | **16** | **16** | **198** |
+
+MIDI files sourced from the [midi-classic-music](https://www.kaggle.com/datasets/blanderbuss/midi-classic-music) Kaggle dataset.
 
 ---
 

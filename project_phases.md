@@ -7,7 +7,7 @@ Develop a deep learning model that accurately predicts the composer of a given c
 
 | | |
 |---|---|
-| **Composers** | Bach, Beethoven, Chopin, Mozart, Schubert (5+) |
+| **Composers** | Bach, Beethoven, Chopin, Mozart (4) |
 | **Input Format** | MIDI files — feature extraction via `music21` / `pretty_midi` |
 | **Architectures** | LSTM (temporal note sequences) · CNN (piano-roll as image) |
 | **Frameworks** | TensorFlow · PyTorch |
@@ -22,11 +22,12 @@ Develop a deep learning model that accurately predicts the composer of a given c
 
 ## Phase 1: Data Collection & Exploration
 
-- [ ] Download and organize the provided MIDI dataset into composer-labeled folders
-  - Expected structure: `data/bach/`, `data/beethoven/`, `data/chopin/`, `data/mozart/`, `data/schubert/`
-- [ ] Explore dataset distribution — file counts per composer, average duration
-- [ ] Validate all MIDI files are readable with `pretty_midi` or `music21`; flag and remove corrupted files
-- [ ] Visualize a few MIDI piano rolls to build intuition for the data
+- [x] Download and organize the MIDI dataset into composer-labeled folders
+  - Structure: `data/{train,dev,test}/{bach,beethoven,chopin,mozart}/`
+  - 198 files total — 166 train / 16 dev / 16 test (≈84 / 8 / 8 %)
+- [x] Explore dataset distribution — file counts per composer, average duration
+- [x] Validate all MIDI files are readable with `pretty_midi`; replace corrupted files
+- [x] Visualize piano rolls for all 4 composers
 
 ---
 
@@ -37,7 +38,7 @@ Develop a deep learning model that accurately predicts the composer of a given c
 - [ ] Create fixed-length sliding windows of note sequences (e.g., window = 100 notes → composer label)
 - [ ] For CNN: generate 2D piano-roll matrices (128 pitches × time steps), normalize to [0, 1]
 - [ ] Apply data augmentation: pitch shifting, tempo scaling
-- [ ] Train / Validation / Test split — 70 / 15 / 15, stratified by composer
+- [ ] Train / Validation / Test split already fixed at 84 / 8 / 8 by dataset structure
 
 ---
 
