@@ -61,7 +61,7 @@ Dense(n_composers, activation='softmax')
 |---|---|
 | **1. Setup & Imports** | Install dependencies, set random seeds, detect GPU |
 | **2. Data Loading & EDA** | Load MIDI paths, class distribution chart, sample piano-roll visualizations |
-| **3. Pre-processing & Feature Extraction** | Note sequence extraction, integer encoding, sliding windows, piano-roll generation, train/val/test split |
+| **3. Pre-processing & Feature Extraction** | Note/chord extraction + tempo (`pretty_midi`), integer encoding, LSTM sliding windows, piano-roll generation, pitch-shift + tempo-scale augmentation, file-level train/val/test split |
 | **4. LSTM Model (TensorFlow)** | Model definition, training with EarlyStopping, accuracy/loss curves |
 | **5. CNN Model (TensorFlow / PyTorch)** | Model definition, training with EarlyStopping, accuracy/loss curves |
 | **6. Evaluation & Comparison** | Classification reports, confusion matrices, LSTM vs CNN summary table, hyperparameter analysis |
@@ -86,7 +86,6 @@ MIDI files sourced from the [midi-classic-music](https://www.kaggle.com/datasets
 ## Dependencies
 
 ```
-music21
 pretty_midi
 tensorflow
 torch

@@ -8,7 +8,7 @@ Develop a deep learning model that accurately predicts the composer of a given c
 | | |
 |---|---|
 | **Composers** | Bach, Beethoven, Chopin, Mozart (4) |
-| **Input Format** | MIDI files — feature extraction via `music21` / `pretty_midi` |
+| **Input Format** | MIDI files — feature extraction via `pretty_midi` |
 | **Architectures** | LSTM (temporal note sequences) · CNN (piano-roll as image) |
 | **Frameworks** | TensorFlow · PyTorch |
 | **Deliverables** | Notebook · Report (APA 7 PDF) · GitHub Repo |
@@ -33,12 +33,33 @@ Develop a deep learning model that accurately predicts the composer of a given c
 
 ## Phase 2: Data Pre-processing & Feature Extraction
 
-- [ ] Extract note sequences (pitch, duration, offset) using `music21`
-- [ ] Build vocabulary of unique notes → encode as integers (needed for LSTM embedding layer)
-- [ ] Create fixed-length sliding windows of note sequences (e.g., window = 100 notes → composer label)
-- [ ] For CNN: generate 2D piano-roll matrices (128 pitches × time steps), normalize to [0, 1]
-- [ ] Apply data augmentation: pitch shifting, tempo scaling
-- [ ] Train / Validation / Test split already fixed at 84 / 8 / 8 by dataset structure
+- [x] Extract note sequences using `pretty_midi` (music21 dropped — it failed to parse several files); chords detected by grouping onsets within 50 ms → joined tokens (e.g. `C4.E4.G4`)
+- [x] Build vocabulary of unique notes → encode as integers (needed for LSTM embedding layer)
+- [x] Create fixed-length sliding windows of note sequences (window = 100 notes, step = 10 → composer label)
+- [x] For CNN: generate 2D piano-roll matrices (128 pitches × time steps), normalize to [0, 1]
+- [x] Apply data augmentation: pitch shifting
+- [x] Train / Validation / Test split kept at the pre-existing folder split (166 / 16 / 16 ≈ 84 / 8 / 8); split at **file level** so no windows leak across sets
+
+---
+
+## Phase 2b: Feature & Augmentation Enhancements
+
+Additions layered on top of Phase 2 to strengthen the stylistic signal and CNN generalization.
+
+- [x] Extract mean **tempo (BPM)** per file via `extract_midi_features()` and record it per composer (`tempo_records`). Finding: most files carry no tempo-change events and fall back to 120 BPM (e.g. all 42 Bach files = 120.0; Beethoven 118.4, Chopin 117.6, Mozart 110.0), so extracted tempo is a **weak** discriminator in this dataset and is not used as a headline feature in the report
+- [x] Add **tempo-scaling** augmentation (0.9×, 1.1×) to the CNN training set alongside the existing pitch shifts, applied over a captured base so already-augmented windows are never re-augmented
+- [x] Save preprocessed arrays to `preprocessed/lstm_data.npz` and `preprocessed/cnn_data.npz`
+
+**Resulting array sizes**
+
+| Representation | Train | Dev | Test |
+|---|---|---|---|
+| Vocabulary | 34,760 unique notes/chords (train only, OOV → 0) | — | — |
+| LSTM windows | 25,620 | 4,249 | 3,215 |
+| CNN windows (base) | 16,364 | 2,340 | 2,033 |
+| CNN windows (augmented) | 114,548 (7× = base + 4 pitch shifts + 2 tempo scales) | 2,340 | 2,033 |
+
+> Note: the small test set (4 files/composer) is a real limitation — Phase 5 reports both window-level and file-level majority-vote accuracy and flags it in the Limitations section.
 
 ---
 
