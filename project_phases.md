@@ -9,8 +9,8 @@ Develop a deep learning model that accurately predicts the composer of a given c
 |---|---|
 | **Composers** | Bach, Beethoven, Chopin, Mozart (4) |
 | **Input Format** | MIDI files — feature extraction via `pretty_midi` |
-| **Architectures** | LSTM (temporal note sequences) · CNN (piano-roll as image) |
-| **Frameworks** | TensorFlow · PyTorch |
+| **Architectures** | LSTM (temporal note sequences) |
+| **Frameworks** | TensorFlow |
 | **Deliverables** | Notebook · Report (APA 7 PDF) · GitHub Repo |
 | **Due Date** | August 26, 2026 |
 
@@ -67,30 +67,27 @@ Additions layered on top of Phase 2 to strengthen the stylistic signal and CNN g
 
 Architecture: `Embedding → LSTM(256) → Dropout(0.3) → LSTM(128) → Dense(64, relu) → Softmax`
 
-- [ ] Build LSTM model in TensorFlow (and PyTorch as reference)
-- [ ] Use categorical cross-entropy loss + Adam optimizer
-- [ ] Train with EarlyStopping (monitor val_accuracy, patience=10) and ModelCheckpoint
-- [ ] Plot training/validation accuracy and loss curves
+- [x] Build LSTM model in TensorFlow
+- [x] Use categorical cross-entropy loss + Adam optimizer
+- [x] Train with EarlyStopping (monitor val_accuracy, patience=10) and ModelCheckpoint
+- [x] Plot training/validation accuracy and loss curves
+
+**Results:** Dev accuracy: 55.26% · Test accuracy: 55.05% · Best epoch: 9 (stopped at 13)
+> Known limitation: severe overfitting (train ~99% vs dev ~55%) due to 34,760-token vocab with many rare file-specific chord tokens.
 
 ---
 
 ## Phase 4: Model Building — CNN
 
-Architecture: `Conv2D(32) → MaxPool → Conv2D(64) → MaxPool → Flatten → Dense(128) → Softmax`
-
-- [ ] Build 2D CNN treating piano-roll matrices as grayscale images
-- [ ] Experiment with filter sizes: 3×3 and 5×5
-- [ ] Add BatchNormalization and Dropout(0.3) for regularization
-- [ ] Train and plot convergence curves
+> **Dropped** — scope reduced to LSTM only for this submission.
 
 ---
 
 ## Phase 5: Evaluation & Optimization
 
-- [ ] Evaluate both models: Accuracy, Precision, Recall, F1-score (`sklearn.metrics.classification_report`)
-- [ ] Plot confusion matrices for LSTM and CNN side-by-side
-- [ ] Hyperparameter tuning: learning rate, batch size, LSTM units, dropout rate
-- [ ] Compare LSTM vs CNN in a summary table
+- [ ] Evaluate LSTM: Accuracy, Precision, Recall, F1-score (`sklearn.metrics.classification_report`)
+- [ ] Plot confusion matrix for LSTM
+- [ ] Window-level and file-level majority-vote accuracy
 - [ ] Error analysis: which composers are most confused with each other?
 
 ---
