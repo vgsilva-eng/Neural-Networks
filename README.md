@@ -9,7 +9,7 @@ Predict the composer of a classical music piece using LSTM and CNN models traine
 
 | Model | Dev Accuracy | Test Accuracy | Parameters |
 |---|---|---|---|
-| LSTM | 55.26% | 55.05% | ~2.76M |
+| LSTM | 57.43% | 55.96% | ~2.76M |
 | **CNN** | **85.90%** | **84.36%** | **~28K** |
 
 **CNN per-composer test F1:** Bach 100% · Chopin 93.95% · Beethoven 74.55% · Mozart 74.39%

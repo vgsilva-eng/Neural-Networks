@@ -4,3 +4,6 @@ data/
 __pycache__/
 .venv/
 .DS_Store
+.ipynb_checkpoints/
+preprocessed/cnn_data.npz
+preprocessed/lstm_data.npz

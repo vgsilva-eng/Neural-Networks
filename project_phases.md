@@ -58,7 +58,7 @@ Develop a deep learning model that accurately predicts the composer of a given c
 - [x] EarlyStopping (patience=10, monitor val_accuracy) + ModelCheckpoint
 - [x] Plot training/validation accuracy and loss curves
 
-**Results:** Dev 55.26% · Test 55.05% · Best epoch: 9 · Stopped at epoch 19
+**Results:** Dev 57.43% · Test 55.96% · Best epoch: 9 · Stopped at epoch 19
 
 > Limitation: severe overfitting (train ~99% vs dev ~55%) driven by the 34,760-token vocabulary — most chord tokens are too rare for the embedding layer to learn meaningful representations.
 
