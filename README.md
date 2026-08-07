@@ -84,6 +84,8 @@ MIDI files sourced from the [midi-classic-music](https://www.kaggle.com/datasets
 
 ## Notebook Structure
 
+[`neural_composer_classifier.ipynb`](neural_composer_classifier.ipynb)
+
 | Section | Content |
 |---|---|
 | **Phase 1** | Data loading, file counts, duration stats, piano-roll visualizations |
@@ -106,8 +108,7 @@ numpy
 pandas
 ```
 
-## Deliverables
+## Team
 
-- `Project_Report-Team#.pdf` — APA 7 technical report
-- Notebook exported as PDF or HTML
-- This repository with clean commit history
+- Tushar Kumar
+- Viviana Garzon Silva
