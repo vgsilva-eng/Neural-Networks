@@ -9,8 +9,8 @@ Develop a deep learning model that accurately predicts the composer of a given c
 |---|---|
 | **Composers** | Bach, Beethoven, Chopin, Mozart (4) |
 | **Input Format** | MIDI files — feature extraction via `pretty_midi` |
-| **Architectures** | LSTM (temporal note sequences) |
-| **Frameworks** | TensorFlow |
+| **Architectures** | LSTM (temporal note sequences) + CNN (piano-roll images) |
+| **Frameworks** | TensorFlow / Keras |
 | **Deliverables** | Notebook · Report (APA 7 PDF) · GitHub Repo |
 | **Due Date** | August 26, 2026 |
 
@@ -18,9 +18,7 @@ Develop a deep learning model that accurately predicts the composer of a given c
 
 ---
 
-## Project Phases — Composer Identification via Deep Learning
-
-## Phase 1: Data Collection & Exploration
+## Phase 1: Data Collection & Exploration ✅
 
 - [x] Download and organize the MIDI dataset into composer-labeled folders
   - Structure: `data/{train,dev,test}/{bach,beethoven,chopin,mozart}/`
@@ -31,74 +29,79 @@ Develop a deep learning model that accurately predicts the composer of a given c
 
 ---
 
-## Phase 2: Data Pre-processing & Feature Extraction
+## Phase 2: Data Pre-processing & Feature Extraction ✅
 
-- [x] Extract note sequences using `pretty_midi` (music21 dropped — it failed to parse several files); chords detected by grouping onsets within 50 ms → joined tokens (e.g. `C4.E4.G4`)
-- [x] Build vocabulary of unique notes → encode as integers (needed for LSTM embedding layer)
-- [x] Create fixed-length sliding windows of note sequences (window = 100 notes, step = 10 → composer label)
-- [x] For CNN: generate 2D piano-roll matrices (128 pitches × time steps), normalize to [0, 1]
-- [x] Apply data augmentation: pitch shifting
-- [x] Train / Validation / Test split kept at the pre-existing folder split (166 / 16 / 16 ≈ 84 / 8 / 8); split at **file level** so no windows leak across sets
-
----
-
-## Phase 2b: Feature & Augmentation Enhancements
-
-Additions layered on top of Phase 2 to strengthen the stylistic signal and CNN generalization.
-
-- [x] Extract mean **tempo (BPM)** per file via `extract_midi_features()` and record it per composer (`tempo_records`). Finding: most files carry no tempo-change events and fall back to 120 BPM (e.g. all 42 Bach files = 120.0; Beethoven 118.4, Chopin 117.6, Mozart 110.0), so extracted tempo is a **weak** discriminator in this dataset and is not used as a headline feature in the report
-- [x] Add **tempo-scaling** augmentation (0.9×, 1.1×) to the CNN training set alongside the existing pitch shifts, applied over a captured base so already-augmented windows are never re-augmented
+- [x] Extract note sequences using `pretty_midi` (music21 dropped — failed to parse several files); chords detected by grouping onsets within 50 ms → joined tokens (e.g. `C4.E4.G4`)
+- [x] Build vocabulary from training data only (34,760 unique tokens; OOV → index 0, no data leakage)
+- [x] Create fixed-length sliding windows of note sequences (window = 100 notes, step = 10)
+- [x] Generate 2D piano-roll matrices (128 pitches × 128 frames), normalized to [0, 1]
+- [x] Apply data augmentation: pitch shifting (±1, ±2 semitones) + tempo scaling (×0.9, ×1.1) → 7× CNN training set
 - [x] Save preprocessed arrays to `preprocessed/lstm_data.npz` and `preprocessed/cnn_data.npz`
 
 **Resulting array sizes**
 
 | Representation | Train | Dev | Test |
 |---|---|---|---|
-| Vocabulary | 34,760 unique notes/chords (train only, OOV → 0) | — | — |
+| Vocabulary | 34,760 unique notes/chords | — | — |
 | LSTM windows | 25,620 | 4,249 | 3,215 |
 | CNN windows (base) | 16,364 | 2,340 | 2,033 |
-| CNN windows (augmented) | 114,548 (7× = base + 4 pitch shifts + 2 tempo scales) | 2,340 | 2,033 |
-
-> Note: the small test set (4 files/composer) is a real limitation — Phase 5 reports both window-level and file-level majority-vote accuracy and flags it in the Limitations section.
+| CNN windows (augmented) | 114,548 | 2,340 | 2,033 |
 
 ---
 
-## Phase 3: Model Building — LSTM
+## Phase 3: Model Building — LSTM ✅
 
-Architecture: `Embedding → LSTM(256) → Dropout(0.3) → LSTM(128) → Dense(64, relu) → Softmax`
+**Architecture:** `Embedding(34760→64) → LSTM(256) → Dropout(0.3) → LSTM(128) → Dense(64, relu) → Dense(4, softmax)`
 
-- [x] Build LSTM model in TensorFlow
-- [x] Use categorical cross-entropy loss + Adam optimizer
-- [x] Train with EarlyStopping (monitor val_accuracy, patience=10) and ModelCheckpoint
+- [x] Build LSTM model in TensorFlow (~2.76M parameters)
+- [x] Categorical cross-entropy loss + Adam optimizer
+- [x] EarlyStopping (patience=10, monitor val_accuracy) + ModelCheckpoint
 - [x] Plot training/validation accuracy and loss curves
 
-**Results:** Dev accuracy: 55.26% · Test accuracy: 55.05% · Best epoch: 9 (stopped at 13)
-> Known limitation: severe overfitting (train ~99% vs dev ~55%) due to 34,760-token vocab with many rare file-specific chord tokens.
+**Results:** Dev 55.26% · Test 55.05% · Best epoch: 9 · Stopped at epoch 19
+
+> Limitation: severe overfitting (train ~99% vs dev ~55%) driven by the 34,760-token vocabulary — most chord tokens are too rare for the embedding layer to learn meaningful representations.
 
 ---
 
-## Phase 4: Model Building — CNN
+## Phase 4: Model Building — CNN ✅
 
-> **Dropped** — scope reduced to LSTM only for this submission.
+**Architecture:** `Conv2D(32,3×3) → BN → Pool → Conv2D(64,3×3) → BN → Pool → Dropout(0.25) → GlobalAveragePooling2D → Dense(128, relu) → Dropout(0.3) → Dense(4, softmax)`
+
+- [x] Build CNN model in TensorFlow (~28K parameters via GlobalAveragePooling2D)
+- [x] Categorical cross-entropy loss + Adam optimizer
+- [x] EarlyStopping (patience=8, monitor val_accuracy) + ModelCheckpoint
+- [x] Train on 114,548 augmented piano-roll windows
+- [x] Plot training/validation accuracy and loss curves
+
+**Results:** Dev 85.90% · Test 84.36% · Best epoch: 24 · Stopped at epoch 32
+
+> GlobalAveragePooling2D replaced Flatten to reduce parameters from 8.41M to ~28K, cutting the overfitting gap and improving test accuracy by +4.82 percentage points over the Flatten baseline.
 
 ---
 
-## Phase 5: Evaluation & Optimization
+## Phase 5: Evaluation & Comparison ✅
 
-- [ ] Evaluate LSTM: Accuracy, Precision, Recall, F1-score (`sklearn.metrics.classification_report`)
-- [ ] Plot confusion matrix for LSTM
-- [ ] Window-level and file-level majority-vote accuracy
-- [ ] Error analysis: which composers are most confused with each other?
+- [x] Classification reports (precision, recall, F1 per composer) for LSTM and CNN — dev and test sets
+- [x] Confusion matrices: 2×2 grid (LSTM dev/test, CNN dev/test)
+- [x] LSTM vs CNN model comparison table (accuracy, precision, recall, F1 macro)
+- [x] Hyperparameter summary table
+- [x] Bar chart: LSTM vs CNN across all metrics
+
+**Key findings:**
+- Bach: 100% precision and recall on CNN test set
+- Chopin: 93.95% F1 on CNN test set
+- Beethoven & Mozart most confused (~74–76% F1) — shared stylistic era
+- LSTM struggled most with Chopin (38% dev F1) — wide-span arpeggios invisible to note sequences
 
 ---
 
-## Phase 6: Report & Submission
+## Phase 6: Report & Submission 🔲
 
-- [ ] Write APA 7 technical report: Introduction, Methodology, Results, Conclusion
-  - File naming: `Project_Report-Team#.pdf`
-- [ ] Add concluding markdown cell to notebook summarizing findings and future work
+- [ ] Add concluding markdown cell to notebook (key findings + future work)
 - [ ] Export notebook as PDF or HTML
-- [ ] Push all code to GitHub repo with clear README and `requirements.txt`
+- [ ] Write APA 7 technical report (`Project_Report-Team#.pdf`)
+- [ ] Push final version to GitHub
 
 ---
 
