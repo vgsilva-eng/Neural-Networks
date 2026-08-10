@@ -98,10 +98,10 @@ Develop a deep learning model that accurately predicts the composer of a given c
 
 ## Phase 6: Report & Submission 🔲
 
-- [ ] Add concluding markdown cell to notebook (key findings + future work)
+- [x] Add concluding markdown cell to notebook (key findings + future work)
+- [x] Write APA 7 technical report (`Project_Report.html` → print to PDF)
 - [ ] Export notebook as PDF or HTML
-- [ ] Write APA 7 technical report (`Project_Report-Team#.pdf`)
-- [ ] Push final version to GitHub
+- [x] Push final version to GitHub
 
 ---
 
@@ -112,3 +112,12 @@ Develop a deep learning model that accurately predicts the composer of a given c
 | A1 | Tensor basics (TF + PyTorch) | Building input tensors from MIDI features |
 | A2 | ANN classification, metrics | Train/eval pipeline, classification report |
 | A3 | RNN/LSTM end-to-end examples | LSTM architecture starting point |
+
+---
+
+## AI Disclosure
+
+Claude (Anthropic, 2024) was used to assist with project workflow planning(project_phases.md), accuracy verification of reported metrics, and APA 7 citation formatting. All technical decisions, model design, training, and analysis were performed by the authors.
+
+
+
